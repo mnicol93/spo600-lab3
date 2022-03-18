@@ -1,4 +1,4 @@
-	define BLACK $00
+		define BLACK $00
 	define WHITE $01
 	define UP $80
 	define DOWN $82
@@ -17,6 +17,10 @@
 	LDA #$03
 	STA $11
 
+	; Index to control the racket's position
+	LDA #$E	;Position where it starts
+	STA $14		;Memory where index resides 
+
 	; Initial point, waiting for user to move
 INPUT:	LDA $FF
 	CMP #$71
@@ -30,7 +34,9 @@ DONE:	BRK
 
 MDOWN:  LDA #$00	; Only move once, so reset $FF
 	STA $FF 
-	
+
+	JSR DCHECK
+
 	; Print reference pixel black to give moving 
         ; sensation
 	LDA #BLACK
@@ -46,9 +52,21 @@ MDOWN:  LDA #$00	; Only move once, so reset $FF
 	ADC #$00
 	STA $11
 
+	; Add one to the index
+	CLC
+	LDA $14
+	ADC #$01
+	STA $14
+
 	; Print one more pixel at the new end	
 	LDA #WHITE
 	LDY #$60
 	STA ($10),y
 
 	JMP INPUT 	; Wait for user's input again
+
+DCHECK: LDA $14
+	CMP #$1C
+	BPL INPUT
+	RTS
+	
