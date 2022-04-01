@@ -290,13 +290,13 @@ BALLUP:	; Ball moving upwards.
 	STA ($20),y
 	
 	; Move the reference one pixel up
-	CLC
+	SEC
 	LDA $20
-	ADC #$20
+	SBC #$20
 	STA $20
 
 	LDA $21
-	ADC #$00
+	SBC #$00
 	STA $21
 	
 	; Subtract one pixel to index Y
@@ -304,6 +304,11 @@ BALLUP:	; Ball moving upwards.
 	LDA $24
 	SBC #$01
 	STA $24
+
+	; Print the ball in the new reference	
+	LDA #$8
+	LDY #$00
+	STA ($20),y
 	
 	; If ball hasn't reached end, return
 	CMP #$00
@@ -322,4 +327,3 @@ BALLDW: ; Ball moving downwards
 BALLRG: ; Ball moving to the right.
 
 BALLLT: ; Ball moving to the left.
-
