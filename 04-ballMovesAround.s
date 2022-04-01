@@ -228,9 +228,6 @@ MDOWN:  LDA #$00	; Only move once, so reset $FF
 
 	JMP MAIN 	; Wait for user's input again
 
-JMAIN:
-	JMP MAIN
-
 MOVUP:  LDA #$00	; Only move once, so reset $FF
 	STA $FF 
 
@@ -282,13 +279,13 @@ UCHECK: LDA $14
 	; #$01 means ball goes to the right and up
 	; #$11 means ball goes to the left and up
 	; #$10 means ball goes to the left and down
-
+JMAIN:
+	JMP MAIN
 MOVBAL: ; Check the direction
 	LDA BDIR
-	CMP #$01
-	BEQ BALLUP
-	CMP #$00
-	BEQ BALLDW
+	CMP #$10
+	BMI BALLRG
+	JMP BALLLT
 
 BALLUP:	; Ball moving upwards.
 	; Print current pixel black
@@ -331,7 +328,92 @@ BALLUP:	; Ball moving upwards.
 	JMP JMAIN
 
 BALLDW: ; Ball moving downwards
+	; Print current pixel black
+	LDA #BLACK
+	LDY #$00
+	STA ($20),y
+	
+	; Move the reference one pixel down
+	CLC
+	LDA $20
+	ADC #$20
+	STA $20
+
+	LDA $21
+	ADC #$00
+	STA $21
+	
+	; Add one pixel to index Y
+	CLC
+	LDA YBALL
+	ADC #$01
+	STA YBALL
+
+	; Print the ball in the new reference	
+	LDA #$8
+	LDY #$00
+	STA ($20),y
+	
+	; If ball hasn't reached end, return
+	LDA YBALL
+	CMP #$1F
+	BNE JMAIN
+	; Otherwise, add #01 to BDIR
+	; to indicate up
+	CLC
+	LDA BDIR
+	ADC #$01
+	STA BDIR
+	
+	JMP JMAIN
+SDIR:	; Check the direction
+	LDA BDIR
+	CMP #$01
+	BEQ BALLUP
+	CMP #$00
+	BEQ BALLDW
 
 BALLRG: ; Ball moving to the right.
+	; Print current pixel black
+	LDA #BLACK
+	LDY #$00
+	STA ($20),y
+	
+	; Move the reference one pixel down
+	CLC
+	LDA $20
+	ADC #$01
+	STA $20
+
+	LDA $21
+	ADC #$00
+	STA $21
+	
+	; Add one pixel to index X
+	CLC
+	LDA XBALL
+	ADC #$01
+	STA XBALL
+
+	; Print the ball in the new reference	
+	LDA #$8
+	LDY #$00
+	STA ($20),y
+	
+	;Testing bounce
+	JMP SDIR
+
+	; If ball hasn't reached end, return
+	LDA XBALL
+	CMP #$1E
+	BNE SDIR
+	; Otherwise, check if it is point, if not
+	; add #XX to BDIR to indicate left
+	CLC
+	LDA BDIR
+	ADC #$01
+	STA BDIR
+	
+	JMP JMAIN
 
 BALLLT: ; Ball moving to the left.
