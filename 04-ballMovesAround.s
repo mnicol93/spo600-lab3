@@ -24,6 +24,10 @@ ILEFT:
 	; Adjust X position
 	LDA #$1
 	STA XBALL
+	; Adjust Y position
+	LDA #$E
+	STA YBALL
+
 	JMP SET
 
 	LDA #$00
@@ -41,6 +45,9 @@ IRIGHT:
 	; Adjust X position
 	LDA #$1E
 	STA XBALL
+	; Adjust Y position
+	LDA #$E
+	STA YBALL
 
 	LDA #$10
 	STA BDIR
@@ -109,9 +116,9 @@ SRVDW:
 	ADC #$01
 	STA $22
 
-	LDA $24
+	LDA YBALL
 	ADC #$01
-	STA $24
+	STA YBALL
 
 	; Print the ball on the new index
 	LDA #$08
@@ -149,9 +156,9 @@ SRVUP:
 	STA $22
 
 	SEC
-	LDA $24
+	LDA YBALL
 	SBC #$01
-	STA $24
+	STA YBALL
 
 	; Print the ball on the new index
 	LDA #$08
@@ -300,10 +307,10 @@ BALLUP:	; Ball moving upwards.
 	STA $21
 	
 	; Subtract one pixel to index Y
-	CLC
-	LDA $24
+	SEC
+	LDA YBALL
 	SBC #$01
-	STA $24
+	STA YBALL
 
 	; Print the ball in the new reference	
 	LDA #$8
@@ -311,6 +318,7 @@ BALLUP:	; Ball moving upwards.
 	STA ($20),y
 	
 	; If ball hasn't reached end, return
+	LDA YBALL
 	CMP #$00
 	BNE JMAIN
 	; Otherwise, subtract #01 from BDIR
